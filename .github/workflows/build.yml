@@ -1,0 +1,25 @@
+name: Diamond Rush 3DS
+on: [push, workflow_dispatch]
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: devkitpro/devkitarm:latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        shell: bash
+        run: |
+          apt-get update -qq && apt-get install -y -qq unzip
+          if [ -f port3ds.zip ]; then unzip -o -q port3ds.zip -d .; fi
+          bash port/ci.sh
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: Diamond Rush 3DS - build ${{ github.run_number }}
+          body: "Installa con FBI > Remote Install > Scan QR Code, inquadrando DiamondRush3DS-QR.png."
+          files: |
+            DiamondRush3DS.cia
+            DiamondRush3DS.3dsx
+            DiamondRush3DS-QR.png
